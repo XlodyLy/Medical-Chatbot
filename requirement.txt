@@ -10,3 +10,6 @@ langchain_openai
 langchain_experimental
 -e .
 gunicorn
+langchain-huggingface
+
+
