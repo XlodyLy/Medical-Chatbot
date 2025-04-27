@@ -1,4 +1,4 @@
-Metadata-Version: 2.4
+Metadata-Version: 2.2
 Name: Generative-AI-Project
 Version: 0.0.0
 Author: Xlody
@@ -6,4 +6,3 @@ Author-email: xlodycrucified@gmail.com
 License-File: LICENSE
 Dynamic: author
 Dynamic: author-email
-Dynamic: license-file

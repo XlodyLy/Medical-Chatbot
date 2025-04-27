@@ -1,45 +1,46 @@
-from src.helper import load_pdf_file, text_split
+from src.helper import load_pdf_file, text_split, download_hugging_face_embeddings
 from pinecone.grpc import PineconeGRPC as Pinecone
 from pinecone import ServerlessSpec
 from langchain_pinecone import PineconeVectorStore
+from langchain_huggingface import HuggingFaceEmbeddings 
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env
+
 load_dotenv()
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
-TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")  # Add Together API key
+TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY") 
 
-# Extract text data from PDFs
 extracted_data = load_pdf_file(data="Data/")
 text_chunks = text_split(extracted_data)
 
-# No need for Hugging Face embeddings. Proceed with your regular embeddings method.
-# Use Pinecone for text embeddings if you're using a pre-built model or another library.
-# Example: Update with Mixtral or another embedding method if needed.
-from langchain.embeddings import OpenAIEmbeddings  # Example, replace if necessary
-embeddings = OpenAIEmbeddings()
+from langchain.embeddings import HuggingFaceEmbeddings
 
-# Initialize Pinecone
+# Use Hugging Face embeddings instead of OpenAI embeddings
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L6-v2")
+
+
+
+
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
 index_name = "medicalbot"
 
-# Create Pinecone index if not already created
+
 pc.create_index(
     name=index_name,
-    dimension=384,  # Ensure this matches your embedding size
-    metric="cosine",
+    dimension=384, 
+    metric="cosine", 
     spec=ServerlessSpec(
-        cloud="aws",
+        cloud="aws", 
         region="us-east-1"
-    )
-)
+    ) 
+) 
 
-# Store the documents into the Pinecone vector store
+# Embed each chunk and upsert the embeddings into your Pinecone index.
 docsearch = PineconeVectorStore.from_documents(
     documents=text_chunks,
     index_name=index_name,
-    embedding=embeddings,
+    embedding=embeddings, 
 )
