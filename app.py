@@ -80,6 +80,22 @@ rag_chain = create_retrieval_chain(retriver, question_answer_chain)
 def index():
     return render_template('index.html')
 
+non_medical_keywords = [
+    'weather', 'news', 'sports', 'joke', 'movie', 'tv', 'music', 'celebrity',
+    'politics', 'food', 'travel', 'shopping', 'games', 'technology', 'science',
+    'history', 'finance', 'economy', 'weather forecast', 'arts', 'entertainment',
+    'comedy', 'fitness', 'culture', 'events', 'social media', 'weather updates'
+]
+
+
+# Function to check if the query is medical-related
+def is_medical_query(query):
+    # Check if the query contains any non-medical keywords
+    for word in non_medical_keywords:
+        if word.lower() in query.lower():
+            return False
+    return True
+
 # Flask route to handle the chatbot messages
 @app.route('/get', methods=["POST"])
 def chat():
@@ -97,6 +113,9 @@ def chat():
 
         # Add user message to conversation history
         session["conversation_history"].append(f"User: {msg}")
+
+        if not is_medical_query(msg):
+            return jsonify({"response": "I am designed to assist with medical-related questions only. Please feel free to ask anything related to health, medicine, or wellness!"})
 
         # Keep only the last 6 lines (3 user + 3 bot turns)
         recent_history = session["conversation_history"][-10:]
